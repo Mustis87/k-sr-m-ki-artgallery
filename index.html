@@ -1,0 +1,709 @@
+<!DOCTYPE html>
+<html lang="fi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Kärsämäen Kuvataidekurssin Digi-Galleria</title>
+<meta name="description" content="Kärsämäen kuvataidekurssin digigallerian kotisivu: tuoreimmat teokset ja ajankohtaiset kuulumiset.">
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,600;0,9..144,700;1,9..144,500&family=Work+Sans:wght@300;400;500;600&family=Caveat:wght@600;700&display=swap" rel="stylesheet">
+
+<style>
+  /* =====================================================
+     DESIGN TOKENS
+     ===================================================== */
+  :root{
+    --color-paper:       #F1E7D2;   /* warm paper background */
+    --color-paper-deep:  #E7D9BC;   /* deeper paper, panels */
+    --color-paper-line:  #D9C7A2;   /* hairlines on paper */
+    --color-ink:         #2E2418;   /* main text */
+    --color-ink-soft:    #55452F;   /* secondary text */
+    --color-moss:        #45592E;   /* primary green */
+    --color-moss-deep:   #303F1F;   /* deep green, nav/footer */
+    --color-moss-light:  #7C9457;   /* light leaf green */
+    --color-clay:        #9C5630;   /* clay / rust accent */
+    --color-gold:        #C6952F;   /* dried-gold accent */
+    --color-walnut:      #5B3F2C;   /* frame wood tone */
+
+    --font-display: 'Fraunces', 'Georgia', serif;
+    --font-body: 'Work Sans', -apple-system, sans-serif;
+    --font-tag: 'Caveat', cursive;
+
+    --nav-height: 72px;
+    --side-gutter: 68px;
+  }
+
+  *{ box-sizing:border-box; }
+  html{
+    scroll-behavior:smooth;
+  }
+  body{
+    margin:0;
+    background:
+      radial-gradient(ellipse at top left, rgba(255,255,255,0.35), transparent 55%),
+      var(--color-paper);
+    color:var(--color-ink);
+    font-family:var(--font-body);
+    font-weight:400;
+    line-height:1.6;
+    -webkit-font-smoothing:antialiased;
+    overflow-x:hidden;
+  }
+  h1,h2,h3{
+    font-family:var(--font-display);
+    color:var(--color-moss-deep);
+    margin:0;
+    letter-spacing:-0.01em;
+  }
+  a{ color:inherit; text-decoration:none; }
+  img{ max-width:100%; display:block; }
+  section{ padding:96px var(--side-gutter); scroll-margin-top:var(--nav-height); }
+  .section-eyebrow{
+    display:block;
+    font-family:var(--font-tag);
+    font-size:1.35rem;
+    color:var(--color-clay);
+    margin-bottom:.15rem;
+  }
+  .section-note{
+    max-width:46ch;
+    color:var(--color-ink-soft);
+    margin:.85rem 0 0;
+  }
+  :focus-visible{
+    outline:3px solid var(--color-clay);
+    outline-offset:3px;
+    border-radius:4px;
+  }
+
+  /* =====================================================
+     PAPER TEXTURE (subtle, no external image needed)
+     ===================================================== */
+  body::before{
+    content:"";
+    position:fixed;
+    inset:0;
+    pointer-events:none;
+    z-index:0;
+    opacity:.5;
+    background-image:
+      radial-gradient(rgba(91,63,44,0.05) 1px, transparent 1px);
+    background-size:3px 3px;
+  }
+
+  /* =====================================================
+     HANGING LEAF VINES  (signature element)
+     ===================================================== */
+  .vine{
+    position:fixed;
+    top:0;
+    height:100vh;
+    width:var(--side-gutter);
+    z-index:5;
+    pointer-events:none;
+  }
+  .vine-left{ left:0; }
+  .vine-right{ right:0; }
+  .vine::after{ /* the vine stem */
+    content:"";
+    position:absolute;
+    top:0; bottom:0;
+    left:50%;
+    width:2px;
+    background:linear-gradient(to bottom,
+      transparent 0%,
+      var(--color-moss-light) 6%,
+      var(--color-moss-light) 94%,
+      transparent 100%);
+    opacity:.55;
+  }
+  .leaf{
+    position:absolute;
+    left:50%;
+    transform-origin:top center;
+    animation:sway var(--sway-dur,5.5s) ease-in-out infinite;
+    animation-delay:var(--sway-delay,0s);
+    filter:drop-shadow(0 3px 3px rgba(46,36,24,0.12));
+  }
+  .leaf svg{ display:block; }
+  .vine-right .leaf{ transform:translateX(-50%) scaleX(-1) rotate(var(--base-rot,0deg)); }
+  .vine-left .leaf{ transform:translateX(-50%) rotate(var(--base-rot,0deg)); }
+
+  @keyframes sway{
+    0%,100%{ rotate:-4deg; }
+    50%{ rotate:4deg; }
+  }
+  /* rotate works alongside transform above via nested wrapper */
+  .leaf-inner{ animation:inherit; }
+
+  @media (max-width:880px){
+    .vine{ width:34px; opacity:.7; }
+    :root{ --side-gutter:28px; }
+  }
+  @media (max-width:620px){
+    .vine-right{ display:none; }
+    :root{ --side-gutter:30px; }
+    .vine .leaf svg{ width:20px; height:30px; }
+  }
+
+  /* =====================================================
+     NAV
+     ===================================================== */
+  nav{
+    position:sticky;
+    top:0;
+    z-index:20;
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    height:var(--nav-height);
+    padding:0 calc(var(--side-gutter) + 12px);
+    background:rgba(241,231,210,0.86);
+    backdrop-filter:blur(6px);
+    border-bottom:1px solid var(--color-paper-line);
+  }
+  .logo{
+    font-family:var(--font-display);
+    font-weight:600;
+    font-size:1.05rem;
+    color:var(--color-moss-deep);
+    flex:1 1 auto;
+    min-width:0;
+    white-space:nowrap;
+    overflow:hidden;
+    text-overflow:ellipsis;
+    margin-right:1.5rem;
+  }
+  .nav-links{
+    display:flex;
+    flex:0 0 auto;
+    gap:2rem;
+    list-style:none;
+    margin:0; padding:0;
+  }
+  .nav-links a{
+    font-size:.95rem;
+    font-weight:500;
+    color:var(--color-ink-soft);
+    padding:.3rem .1rem;
+    border-bottom:2px solid transparent;
+    transition:border-color .25s ease, color .25s ease;
+  }
+  .nav-links a:hover{
+    color:var(--color-moss-deep);
+    border-color:var(--color-clay);
+  }
+  .nav-short{ display:none; }
+  @media (max-width:620px){
+    .nav-links{ gap:1.1rem; }
+    .nav-full{ display:none; }
+    .nav-short{ display:inline; }
+  }
+
+  /* =====================================================
+     HERO
+     ===================================================== */
+  .hero{
+    min-height:calc(100vh - var(--nav-height));
+    display:flex;
+    flex-direction:column;
+    align-items:flex-start;
+    justify-content:center;
+    padding:40px calc(var(--side-gutter) + 12px);
+    position:relative;
+  }
+  .eyebrow{
+    font-family:var(--font-tag);
+    font-size:1.6rem;
+    color:var(--color-clay);
+    margin:0 0 .25rem;
+  }
+  .hero h1{
+    font-size:clamp(2.1rem, 5.4vw, 3.9rem);
+    line-height:1.08;
+    max-width:15ch;
+  }
+  .tagline{
+    font-family:var(--font-display);
+    font-style:italic;
+    font-weight:500;
+    font-size:clamp(1.15rem, 2.2vw, 1.5rem);
+    color:var(--color-moss);
+    margin:1.1rem 0 0;
+    max-width:32ch;
+  }
+  .intro-text{
+    margin:1.6rem 0 0;
+    max-width:56ch;
+    font-size:1.05rem;
+    color:var(--color-ink-soft);
+  }
+  .cta{
+    margin-top:2.3rem;
+    display:inline-flex;
+    align-items:center;
+    gap:.5rem;
+    background:var(--color-moss-deep);
+    color:var(--color-paper);
+    font-weight:500;
+    padding:.85rem 1.6rem;
+    border-radius:3px;
+    transition:transform .25s ease, background .25s ease, box-shadow .25s ease;
+    box-shadow:0 6px 16px rgba(48,63,31,0.25);
+  }
+  .cta:hover{
+    background:var(--color-clay);
+    transform:translateY(-2px);
+  }
+
+  /* reveal-on-scroll */
+  .reveal{
+    opacity:0;
+    transform:translateY(22px);
+    transition:opacity .7s ease, transform .7s ease;
+  }
+  .reveal.is-visible{ opacity:1; transform:none; }
+
+  /* =====================================================
+     GALLERY
+     ===================================================== */
+  .gallery{
+    background:var(--color-paper-deep);
+    border-top:1px solid var(--color-paper-line);
+    border-bottom:1px solid var(--color-paper-line);
+  }
+  .gallery h2, .social h2{ font-size:clamp(1.9rem, 4vw, 2.6rem); margin-top:.1rem; }
+  .gallery-grid{
+    margin-top:3rem;
+    display:grid;
+    grid-template-columns:repeat(4, 1fr);
+    gap:2.4rem 2rem;
+  }
+  @media (max-width:980px){ .gallery-grid{ grid-template-columns:repeat(2,1fr); } }
+  @media (max-width:520px){ .gallery-grid{ grid-template-columns:1fr; } }
+
+  .art-frame{ position:relative; }
+  .art-frame__corner{
+    position:absolute;
+    top:-18px; right:-10px;
+    width:26px; height:40px;
+    z-index:2;
+    transform:rotate(18deg);
+    filter:drop-shadow(0 2px 3px rgba(46,36,24,.2));
+  }
+  .frame-wood{
+    background:
+      linear-gradient(155deg, #6b4a34, #4c3323 70%);
+    padding:12px;
+    border-radius:4px;
+    box-shadow:
+      0 14px 28px rgba(46,36,24,0.18),
+      0 2px 6px rgba(46,36,24,0.12);
+    transition:transform .35s ease, box-shadow .35s ease;
+  }
+  .art-frame:hover .frame-wood{
+    transform:translateY(-6px);
+    box-shadow:
+      0 22px 34px rgba(46,36,24,0.22),
+      0 4px 8px rgba(46,36,24,0.14);
+  }
+  .art-mat{
+    background:var(--color-paper);
+    padding:10px;
+    border-radius:2px;
+  }
+  .art-photo{
+    position:relative;
+    aspect-ratio:1/1;
+    overflow:hidden;
+    background:var(--color-paper-deep);
+  }
+  .art-photo img{
+    width:100%; height:100%;
+    object-fit:cover;
+    transition:transform .6s ease;
+  }
+  .art-frame:hover .art-photo img{ transform:scale(1.06); }
+  .art-placeholder{
+    display:none;
+    position:absolute; inset:0;
+    flex-direction:column;
+    align-items:center;
+    justify-content:center;
+    gap:.5rem;
+    text-align:center;
+    padding:1rem;
+    color:var(--color-ink-soft);
+  }
+  .art-photo.is-empty .art-placeholder{ display:flex; }
+  .art-placeholder svg{ width:34px; height:34px; opacity:.55; }
+  .art-placeholder span{ font-size:.85rem; font-weight:500; }
+  .art-placeholder code{
+    font-family:var(--font-body);
+    font-size:.75rem;
+    background:rgba(91,63,44,.08);
+    padding:.15rem .5rem;
+    border-radius:3px;
+    color:var(--color-clay);
+  }
+  .art-caption{
+    font-family:var(--font-tag);
+    font-size:1.35rem;
+    color:var(--color-ink-soft);
+    text-align:center;
+    margin:.85rem 0 0;
+  }
+
+  /* =====================================================
+     SOCIAL
+     ===================================================== */
+  .social-links{
+    margin-top:2.4rem;
+    display:flex;
+    gap:1.2rem;
+    flex-wrap:wrap;
+  }
+  .social-link{
+    display:flex;
+    align-items:center;
+    gap:.6rem;
+    background:var(--color-paper);
+    border:1px solid var(--color-paper-line);
+    padding:.85rem 1.4rem;
+    border-radius:40px;
+    font-weight:500;
+    transition:transform .25s ease, border-color .25s ease, background .25s ease;
+  }
+  .social-link:hover{
+    transform:translateY(-3px);
+    border-color:var(--color-clay);
+    background:#fff;
+  }
+  .social-link svg{ width:20px; height:20px; color:var(--color-moss-deep); }
+
+  /* =====================================================
+     FOOTER
+     ===================================================== */
+  footer{
+    background:var(--color-moss-deep);
+    color:var(--color-paper);
+    padding:2.6rem var(--side-gutter);
+    text-align:center;
+  }
+  footer p{ margin:.25rem 0; }
+  .footer-note{
+    font-family:var(--font-tag);
+    font-size:1.15rem;
+    color:#C9D6B8;
+  }
+
+  @media (prefers-reduced-motion: reduce){
+    html{ scroll-behavior:auto; }
+    .leaf{ animation:none !important; }
+    .reveal{ transition:none !important; opacity:1 !important; transform:none !important; }
+    .cta:hover, .art-frame:hover .frame-wood, .art-frame:hover .art-photo img, .social-link:hover{
+      transform:none !important;
+    }
+  }
+</style>
+</head>
+<body>
+
+<!-- ============================================================
+     DECORATIVE LEAF VINES — purely visual, hidden from screen readers
+     ============================================================ -->
+<div class="vine vine-left" aria-hidden="true" id="vineLeft"></div>
+<div class="vine vine-right" aria-hidden="true" id="vineRight"></div>
+
+<nav>
+  <a href="#alku" class="logo">Kärsämäen Kuvataidekurssin Digi-Galleria</a>
+  <ul class="nav-links">
+    <li><a href="#alku">Etusivu</a></li>
+    <li><a href="#teokset">Teokset</a></li>
+    <li><a href="#some"><span class="nav-full">Seuraa meitä</span><span class="nav-short">Some</span></a></li>
+  </ul>
+</nav>
+
+<header class="hero" id="alku">
+  <p class="eyebrow reveal">Taidepiiri</p>
+  <h1 class="reveal">Kärsämäen Kuvataidekurssin Digi-Galleria</h1>
+  <p class="tagline reveal">Taidetta, joka kasvaa käsistämme kuin lehdet puusta.</p>
+  <p class="intro-text reveal">
+    Tervetuloa galleriaamme! Kokoonnumme säännöllisesti maalaamaan, piirtämään
+    ja kokeilemaan uutta – innoituksemme haemme metsästä, valosta ja väreistä, joita
+    luonto meille tarjoaa. Tällä sivulla pääset ihailemaan ryhmämme tuoreimpia
+    teoksia ja seuraamaan, mitä milloinkin puuhaamme.
+  </p>
+  <a href="#teokset" class="cta reveal">Katso teoksemme ↓</a>
+</header>
+
+<main>
+  <section id="teokset" class="gallery">
+    <span class="section-eyebrow reveal">Galleria</span>
+    <h2 class="reveal">Tuoreimmat teokset</h2>
+    <p class="section-note reveal">Jokainen kehys odottaa vielä omaa teostaan – lisää kuvat ohjeiden mukaan.</p>
+
+    <div class="gallery-grid">
+      <!-- ================================================================
+           ART BOX 1 of 8
+           To add a picture: name your photo file exactly  tyo1.jpg
+           and place it in the SAME FOLDER as this index.html file.
+           Repeat the pattern below for tyo2.jpg ... tyo8.jpg
+           ================================================================ -->
+      <div class="art-frame reveal">
+        <div class="art-frame__corner" aria-hidden="true">
+          <svg viewBox="0 0 40 60" width="100%" height="100%">
+            <path d="M20 2 C34 14 34 46 20 58 C6 46 6 14 20 2 Z" fill="var(--color-gold)"/>
+            <path d="M20 8 L20 52" stroke="rgba(46,36,24,0.35)" stroke-width="1.3"/>
+          </svg>
+        </div>
+        <div class="frame-wood">
+          <div class="art-mat">
+            <div class="art-photo">
+              <img src="tyo1.jpg" alt="Taideteos 1" loading="lazy"
+                   onerror="this.parentElement.classList.add('is-empty'); this.remove();">
+              <div class="art-placeholder">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><rect x="3" y="4" width="18" height="16" rx="2"/><circle cx="8.5" cy="9.5" r="1.5"/><path d="M21 16l-5.5-5.5L3 20"/></svg>
+                <span>Lisää kuva tähän</span>
+                <code>tyo1.jpg</code>
+              </div>
+            </div>
+          </div>
+        </div>
+        <p class="art-caption">Teoksen nimi</p>
+      </div>
+
+      <div class="art-frame reveal">
+        <div class="art-frame__corner" aria-hidden="true">
+          <svg viewBox="0 0 40 60" width="100%" height="100%">
+            <path d="M20 2 C34 14 34 46 20 58 C6 46 6 14 20 2 Z" fill="var(--color-gold)"/>
+            <path d="M20 8 L20 52" stroke="rgba(46,36,24,0.35)" stroke-width="1.3"/>
+          </svg>
+        </div>
+        <div class="frame-wood">
+          <div class="art-mat">
+            <div class="art-photo">
+              <img src="tyo2.jpg" alt="Taideteos 2" loading="lazy"
+                   onerror="this.parentElement.classList.add('is-empty'); this.remove();">
+              <div class="art-placeholder">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><rect x="3" y="4" width="18" height="16" rx="2"/><circle cx="8.5" cy="9.5" r="1.5"/><path d="M21 16l-5.5-5.5L3 20"/></svg>
+                <span>Lisää kuva tähän</span>
+                <code>tyo2.jpg</code>
+              </div>
+            </div>
+          </div>
+        </div>
+        <p class="art-caption">Teoksen nimi</p>
+      </div>
+
+      <div class="art-frame reveal">
+        <div class="art-frame__corner" aria-hidden="true">
+          <svg viewBox="0 0 40 60" width="100%" height="100%">
+            <path d="M20 2 C34 14 34 46 20 58 C6 46 6 14 20 2 Z" fill="var(--color-gold)"/>
+            <path d="M20 8 L20 52" stroke="rgba(46,36,24,0.35)" stroke-width="1.3"/>
+          </svg>
+        </div>
+        <div class="frame-wood">
+          <div class="art-mat">
+            <div class="art-photo">
+              <img src="tyo3.jpg" alt="Taideteos 3" loading="lazy"
+                   onerror="this.parentElement.classList.add('is-empty'); this.remove();">
+              <div class="art-placeholder">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><rect x="3" y="4" width="18" height="16" rx="2"/><circle cx="8.5" cy="9.5" r="1.5"/><path d="M21 16l-5.5-5.5L3 20"/></svg>
+                <span>Lisää kuva tähän</span>
+                <code>tyo3.jpg</code>
+              </div>
+            </div>
+          </div>
+        </div>
+        <p class="art-caption">Teoksen nimi</p>
+      </div>
+
+      <div class="art-frame reveal">
+        <div class="art-frame__corner" aria-hidden="true">
+          <svg viewBox="0 0 40 60" width="100%" height="100%">
+            <path d="M20 2 C34 14 34 46 20 58 C6 46 6 14 20 2 Z" fill="var(--color-gold)"/>
+            <path d="M20 8 L20 52" stroke="rgba(46,36,24,0.35)" stroke-width="1.3"/>
+          </svg>
+        </div>
+        <div class="frame-wood">
+          <div class="art-mat">
+            <div class="art-photo">
+              <img src="tyo4.jpg" alt="Taideteos 4" loading="lazy"
+                   onerror="this.parentElement.classList.add('is-empty'); this.remove();">
+              <div class="art-placeholder">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><rect x="3" y="4" width="18" height="16" rx="2"/><circle cx="8.5" cy="9.5" r="1.5"/><path d="M21 16l-5.5-5.5L3 20"/></svg>
+                <span>Lisää kuva tähän</span>
+                <code>tyo4.jpg</code>
+              </div>
+            </div>
+          </div>
+        </div>
+        <p class="art-caption">Teoksen nimi</p>
+      </div>
+
+      <div class="art-frame reveal">
+        <div class="art-frame__corner" aria-hidden="true">
+          <svg viewBox="0 0 40 60" width="100%" height="100%">
+            <path d="M20 2 C34 14 34 46 20 58 C6 46 6 14 20 2 Z" fill="var(--color-gold)"/>
+            <path d="M20 8 L20 52" stroke="rgba(46,36,24,0.35)" stroke-width="1.3"/>
+          </svg>
+        </div>
+        <div class="frame-wood">
+          <div class="art-mat">
+            <div class="art-photo">
+              <img src="tyo5.jpg" alt="Taideteos 5" loading="lazy"
+                   onerror="this.parentElement.classList.add('is-empty'); this.remove();">
+              <div class="art-placeholder">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><rect x="3" y="4" width="18" height="16" rx="2"/><circle cx="8.5" cy="9.5" r="1.5"/><path d="M21 16l-5.5-5.5L3 20"/></svg>
+                <span>Lisää kuva tähän</span>
+                <code>tyo5.jpg</code>
+              </div>
+            </div>
+          </div>
+        </div>
+        <p class="art-caption">Teoksen nimi</p>
+      </div>
+
+      <div class="art-frame reveal">
+        <div class="art-frame__corner" aria-hidden="true">
+          <svg viewBox="0 0 40 60" width="100%" height="100%">
+            <path d="M20 2 C34 14 34 46 20 58 C6 46 6 14 20 2 Z" fill="var(--color-gold)"/>
+            <path d="M20 8 L20 52" stroke="rgba(46,36,24,0.35)" stroke-width="1.3"/>
+          </svg>
+        </div>
+        <div class="frame-wood">
+          <div class="art-mat">
+            <div class="art-photo">
+              <img src="tyo6.jpg" alt="Taideteos 6" loading="lazy"
+                   onerror="this.parentElement.classList.add('is-empty'); this.remove();">
+              <div class="art-placeholder">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><rect x="3" y="4" width="18" height="16" rx="2"/><circle cx="8.5" cy="9.5" r="1.5"/><path d="M21 16l-5.5-5.5L3 20"/></svg>
+                <span>Lisää kuva tähän</span>
+                <code>tyo6.jpg</code>
+              </div>
+            </div>
+          </div>
+        </div>
+        <p class="art-caption">Teoksen nimi</p>
+      </div>
+
+      <div class="art-frame reveal">
+        <div class="art-frame__corner" aria-hidden="true">
+          <svg viewBox="0 0 40 60" width="100%" height="100%">
+            <path d="M20 2 C34 14 34 46 20 58 C6 46 6 14 20 2 Z" fill="var(--color-gold)"/>
+            <path d="M20 8 L20 52" stroke="rgba(46,36,24,0.35)" stroke-width="1.3"/>
+          </svg>
+        </div>
+        <div class="frame-wood">
+          <div class="art-mat">
+            <div class="art-photo">
+              <img src="tyo7.jpg" alt="Taideteos 7" loading="lazy"
+                   onerror="this.parentElement.classList.add('is-empty'); this.remove();">
+              <div class="art-placeholder">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><rect x="3" y="4" width="18" height="16" rx="2"/><circle cx="8.5" cy="9.5" r="1.5"/><path d="M21 16l-5.5-5.5L3 20"/></svg>
+                <span>Lisää kuva tähän</span>
+                <code>tyo7.jpg</code>
+              </div>
+            </div>
+          </div>
+        </div>
+        <p class="art-caption">Teoksen nimi</p>
+      </div>
+
+      <div class="art-frame reveal">
+        <div class="art-frame__corner" aria-hidden="true">
+          <svg viewBox="0 0 40 60" width="100%" height="100%">
+            <path d="M20 2 C34 14 34 46 20 58 C6 46 6 14 20 2 Z" fill="var(--color-gold)"/>
+            <path d="M20 8 L20 52" stroke="rgba(46,36,24,0.35)" stroke-width="1.3"/>
+          </svg>
+        </div>
+        <div class="frame-wood">
+          <div class="art-mat">
+            <div class="art-photo">
+              <img src="tyo8.jpg" alt="Taideteos 8" loading="lazy"
+                   onerror="this.parentElement.classList.add('is-empty'); this.remove();">
+              <div class="art-placeholder">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><rect x="3" y="4" width="18" height="16" rx="2"/><circle cx="8.5" cy="9.5" r="1.5"/><path d="M21 16l-5.5-5.5L3 20"/></svg>
+                <span>Lisää kuva tähän</span>
+                <code>tyo8.jpg</code>
+              </div>
+            </div>
+          </div>
+        </div>
+        <p class="art-caption">Teoksen nimi</p>
+      </div>
+    </div>
+  </section>
+
+  <section id="some" class="social">
+    <span class="section-eyebrow reveal">Yhteisö</span>
+    <h2 class="reveal">Löydä meidät</h2>
+    <p class="section-note reveal">Some-tilimme avataan pian – lisää linkit tähän heti kun ne ovat valmiina.</p>
+
+    <div class="social-links reveal">
+      <!-- INSTAGRAM: replace href="#" below with your profile link, e.g. https://www.instagram.com/kayttajanimi -->
+      <a href="#" class="social-link" aria-label="Instagram">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><rect x="3" y="3" width="18" height="18" rx="5"/><circle cx="12" cy="12" r="4"/><circle cx="17.2" cy="6.8" r="1"/></svg>
+        <span>Instagram</span>
+      </a>
+      <!-- TIKTOK: replace href="#" below with your profile link, e.g. https://www.tiktok.com/@kayttajanimi -->
+      <a href="#" class="social-link" aria-label="TikTok">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><path d="M14 3v10.5a3.5 3.5 0 1 1-3-3.46"/><path d="M14 3c0 2.5 2 4.5 4.5 4.5"/></svg>
+        <span>TikTok</span>
+      </a>
+    </div>
+  </section>
+</main>
+
+<footer>
+  <p>© <span id="year"></span> Kärsämäen Kuvataidekurssin Digi-Galleria</p>
+  <p class="footer-note">Tehty kynän, siveltimen ja rakkauden voimalla.</p>
+</footer>
+
+<script>
+  // Current year in footer
+  document.getElementById('year').textContent = new Date().getFullYear();
+
+  // Scroll-reveal animation
+  const revealEls = document.querySelectorAll('.reveal');
+  const io = new IntersectionObserver((entries) => {
+    entries.forEach(e => {
+      if (e.isIntersecting){
+        e.target.classList.add('is-visible');
+        io.unobserve(e.target);
+      }
+    });
+  }, { threshold: 0.15 });
+  revealEls.forEach(el => io.observe(el));
+
+  // Build the hanging leaf vines
+  function leafSVG(color){
+    return `<svg viewBox="0 0 40 60" width="30" height="45">
+      <path d="M20 2 C34 14 34 46 20 58 C6 46 6 14 20 2 Z" fill="${color}"/>
+      <path d="M20 8 L20 52" stroke="rgba(46,36,24,0.35)" stroke-width="1.3"/>
+    </svg>`;
+  }
+  const leafColors = ['var(--color-moss)','var(--color-moss-light)','var(--color-gold)','var(--color-clay)','var(--color-moss)','var(--color-moss-light)'];
+  const positions = [4, 16, 28, 40, 52, 64, 76, 88];
+
+  function buildVine(container, mirrorOffset){
+    positions.forEach((top, i) => {
+      const wrap = document.createElement('div');
+      wrap.className = 'leaf';
+      wrap.style.top = (top + mirrorOffset) + '%';
+      wrap.style.setProperty('--sway-dur', (4.5 + (i % 4) * 0.7) + 's');
+      wrap.style.setProperty('--sway-delay', (i * 0.35) + 's');
+      wrap.style.setProperty('--base-rot', ((i % 2 === 0) ? -6 : 6) + 'deg');
+      wrap.innerHTML = leafSVG(leafColors[i % leafColors.length]);
+      container.appendChild(wrap);
+    });
+  }
+  buildVine(document.getElementById('vineLeft'), 0);
+  buildVine(document.getElementById('vineRight'), 5);
+</script>
+
+</body>
+</html>
